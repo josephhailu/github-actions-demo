@@ -1,0 +1,42 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Releases Folder
+      run: mkdir releases
+
+    - name: Zip Build Artifacts
+      run: zip -r releases/build.zip build/
+
+    - name: Upload Release
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-artifact
+        path: releases/
